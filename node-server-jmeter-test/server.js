@@ -1,13 +1,46 @@
 const http = require('http');
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/") {
+  const { url, method } = req;
+
+  if (url === '/' && method === 'GET') {
     res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Hello from Railway Test Server!");
-  } else if (req.url === "/status") {
+    res.end("Hello from www.duhotest.com\n");
+  }
+
+  else if (url === '/status' && method === 'GET') {
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status: "ok", time: new Date() }));
-  } else {
+    res.end(JSON.stringify({ status: "ok", timestamp: new Date() }));
+  }
+
+  else if (url === '/echo' && method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk });
+    req.on('end', () => {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ you_sent: body }));
+    });
+  }
+
+  else if (url === '/delay' && method === 'GET') {
+    setTimeout(() => {
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end("Delayed response after 2 seconds");
+    }, 2000);
+  }
+
+  else if (url === '/random-error' && method === 'GET') {
+    const fail = Math.random() < 0.1; // 10% 확률 실패
+    if (fail) {
+      res.writeHead(500, { "Content-Type": "text/plain" });
+      res.end("Internal Server Error (random)");
+    } else {
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end("Success!");
+    }
+  }
+
+  else {
     res.writeHead(404, { "Content-Type": "text/plain" });
     res.end("Not Found");
   }
