@@ -50,3 +50,22 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+app.post('/echo', (req, res) => {
+  res.json({ received: req.body.message });
+});
+
+app.get('/delay', async (req, res) => {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  res.send('Delayed Response');
+});
+
+app.get('/random-error', (req, res) => {
+  const ok = Math.random() > 0.5;
+  if (ok) {
+    res.send('OK');
+  } else {
+    res.status(500).send('Random Error!');
+  }
+});
